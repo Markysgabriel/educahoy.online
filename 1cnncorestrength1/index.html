@@ -392,98 +392,150 @@
 	<footer></footer>
 	<script src="./assets/js/bootstrap.bundle.min.js"></script>
 	<script type="text/javascript">
-		document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function () {
 
+  // ============================================================
+  // CONFIG: informe o tempo do pitch (hh:mm:ss OU mm:ss OU segundos)
+  // ============================================================
+  var TIME_TO_DISPLAY = "00:00:05"; // exemplo: "12:30" | "00:12:30" | 750
 
-			// === INFORME O TEMPO DO PITCH AQUI NO FORMATO hh:mm:ss OU mm:ss OU SEGUNDOS === //
+  // ============================================================
+  // FUNÇÃO: converte tempo para segundos
+  // ============================================================
+  function convertTimeToSeconds(time) {
+    if (typeof time === "number") return time;
+    if (typeof time !== "string") return 0;
 
-			var TIME_TO_DISPLAY = "00:36:25"; // exemplo
-			
-			// ================================================================= //
+    const parts = time.split(":").map(p => parseInt(p, 10));
+    if (parts.length === 2) { // mm:ss
+      const [m, s] = parts;
+      return (m * 60) + s;
+    }
+    if (parts.length === 3) { // hh:mm:ss
+      const [h, m, s] = parts;
+      return (h * 3600) + (m * 60) + s;
+    }
+    return 0;
+  }
 
-			function convertTimeToSeconds(time) {
-				// Se já for número, retorna direto
-				if (typeof time === "number") return time;
+  var SECONDS_TO_DISPLAY = convertTimeToSeconds(TIME_TO_DISPLAY);
 
-				if (typeof time !== "string") return 0;
+  // ============================================================
+  // CONFIG: id do bloco de vendas (deve existir no HTML)
+  // Ex.: <div id="sales-block" style="display:none">...</div>
+  // ============================================================
+  var SALES_BLOCK_ID = "sales-block";
 
-				const parts = time.split(":").map(p => parseInt(p, 10));
+  // ============================================================
+  // CONFIG: cache (dias) para não esconder de novo depois
+  // ============================================================
+  var EXPIRATION_DAYS = 14;
+  var alreadyDisplayedKey = "alreadyElsDisplayed_" + SECONDS_TO_DISPLAY;
 
-				// mm:ss
-				if (parts.length === 2) {
-					const [m, s] = parts;
-					return (m * 60) + s;
-				}
+  // ============================================================
+  // STORAGE (com expiração)
+  // ============================================================
+  class StorageHandler {
+    static expiryTime = EXPIRATION_DAYS * 86400000;
 
-				// hh:mm:ss
-				if (parts.length === 3) {
-					const [h, m, s] = parts;
-					return (h * 3600) + (m * 60) + s;
-				}
+    static set(key, value) {
+      localStorage.setItem(
+        key,
+        JSON.stringify({ value, expiry: Date.now() + this.expiryTime })
+      );
+    }
 
-				return 0;
-			}
+    static get(key) {
+      var item = localStorage.getItem(key);
+      if (!item) return null;
 
-			var SECONDS_TO_DISPLAY = convertTimeToSeconds(TIME_TO_DISPLAY);
+      var parsed = JSON.parse(item);
+      if (!parsed || typeof parsed !== "object") return null;
 
-			var CLASS_TO_DISPLAY = ".mostrar";
-			var EXPIRATION_DAYS = 14;
-			var alreadyDisplayedKey = "alreadyElsDisplayed" + SECONDS_TO_DISPLAY;
-			var elsHidden = document.querySelectorAll(CLASS_TO_DISPLAY);
-			var elsDisplayed = false;
-			var attempts = 0;
+      var value = parsed.value;
+      var expiry = parsed.expiry;
 
-			class StorageHandler {
-				static expiryTime = EXPIRATION_DAYS * 86400000;
+      if (Date.now() > expiry) {
+        localStorage.removeItem(key);
+        return null;
+      }
+      return value;
+    }
+  }
 
-				static set(key, value) {
-					localStorage.setItem(
-						key,
-						JSON.stringify({ value, expiry: Date.now() + this.expiryTime })
-						);
-				}
+  // ============================================================
+  // REVEAL + AUTO-SCROLL (NOVO)
+  // - mostra o bloco
+  // - rola automaticamente até ele
+  // ============================================================
+  function revealAndScrollToSalesBlock() {
+    const el = document.getElementById(SALES_BLOCK_ID);
+    if (!el) return;
 
-				static get(key) {
-					var item = localStorage.getItem(key);
-					if (!item) return null;
+    // evita executar várias vezes
+    if (el.dataset.revealed === "1") return;
+    el.dataset.revealed = "1";
 
-					var { value, expiry } = JSON.parse(item);
-					if (Date.now() > expiry) {
-						localStorage.removeItem(key);
-						return null;
-					}
-					return value;
-				}
-			}
+    // mostra o bloco
+    el.style.display = "block";
+    el.hidden = false;
+    el.setAttribute("aria-hidden", "false");
 
-			var alreadyElsDisplayed = StorageHandler.get(alreadyDisplayedKey);
+    // salva para próximas visitas (não esconder de novo)
+    StorageHandler.set(alreadyDisplayedKey, true);
 
-			var showHiddenElements = function () {
-				const elemento = document.getElementById('sales-block');
-				elemento.style.display = 'block';
-			};
+    // rola até o bloco (com delay pequeno para layout assentar)
+    setTimeout(() => {
+      el.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 200);
+  }
 
-			var startWatchVideoProgress = function () {
-				if (typeof smartplayer === 'undefined' || !(smartplayer.instances && smartplayer.instances.length)) {
-					if (attempts >= 10) return;
-					attempts++;
-					return setTimeout(startWatchVideoProgress, 1000);
-				}
-				smartplayer.instances[0].on('timeupdate', () => {
-					if (elsDisplayed || smartplayer.instances[0].smartAutoPlay) return;
-					if (smartplayer.instances[0].video.currentTime < SECONDS_TO_DISPLAY) return;
-					showHiddenElements();
-				});
-			};
+  // ============================================================
+  // FUNÇÃO chamada quando chega no tempo (mantém o nome do seu código)
+  // ============================================================
+  var showHiddenElements = function () {
+    revealAndScrollToSalesBlock();
+  };
 
-			if (alreadyElsDisplayed) {
-				setTimeout(showHiddenElements, 100);
-			} else {
-				startWatchVideoProgress();
-			}
-		});
+  // ============================================================
+  // WATCH PROGRESS DO VÍDEO (Smartplayer)
+  // ============================================================
+  var attempts = 0;
 
-	</script>
+  var startWatchVideoProgress = function () {
+    // espera o smartplayer carregar
+    if (typeof smartplayer === "undefined" || !(smartplayer.instances && smartplayer.instances.length)) {
+      if (attempts >= 10) return;
+      attempts++;
+      return setTimeout(startWatchVideoProgress, 1000);
+    }
+
+    // escuta o tempo do vídeo
+    smartplayer.instances[0].on("timeupdate", () => {
+      // se já mostrou, não faz nada
+      const sales = document.getElementById(SALES_BLOCK_ID);
+      if (sales && sales.dataset.revealed === "1") return;
+
+      // se ainda não chegou no tempo, sai
+      if (smartplayer.instances[0].video.currentTime < SECONDS_TO_DISPLAY) return;
+
+      // chegou no tempo: mostra + rola
+      showHiddenElements();
+    });
+  };
+
+  // ============================================================
+  // INÍCIO: se já foi mostrado antes (dentro do prazo), mostra direto
+  // ============================================================
+  var alreadyElsDisplayed = StorageHandler.get(alreadyDisplayedKey);
+
+  if (alreadyElsDisplayed) {
+    setTimeout(showHiddenElements, 100);
+  } else {
+    startWatchVideoProgress();
+  }
+});
+</script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             // Configuração: 3 dias úteis
