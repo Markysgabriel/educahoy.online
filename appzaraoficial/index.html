@@ -1,0 +1,1127 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ZARA 50 AÑOS</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Nunito',sans-serif;background:#f5f5f5;min-height:100vh}
+
+  /* HEADER */
+  .header{background:linear-gradient(135deg,#000000,#333333);padding:14px 20px;display:flex;align-items:center;justify-content:space-between}
+  .header-left{display:flex;align-items:center;gap:12px}
+  .menu-btn{background:rgba(255,255,255,0.2);border:none;border-radius:8px;padding:7px 10px;cursor:pointer;color:#fff;font-size:18px;line-height:1}
+  .menu-btn:hover{background:rgba(255,255,255,0.35)}
+  .header-logo{color:#fff;font-size:20px;font-weight:900}
+  .header-sub{color:rgba(255,255,255,0.85);font-size:11px}
+  .cart-badge{background:#fff;color:#000000;font-size:13px;font-weight:900;border-radius:20px;padding:5px 13px;cursor:pointer;display:flex;align-items:center;gap:5px}
+  .cart-badge span{background:#000000;color:#fff;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900}
+
+  /* SIDEBAR */
+  .sidebar-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:200;display:none;opacity:0;transition:opacity 0.25s}
+  .sidebar-overlay.open{display:block;opacity:1}
+  .sidebar{position:fixed;top:0;left:-280px;width:280px;height:100%;background:#fff;z-index:201;transition:left 0.25s;display:flex;flex-direction:column;box-shadow:4px 0 24px rgba(0,0,0,0.15)}
+  .sidebar.open{left:0}
+  .sidebar-header{background:linear-gradient(135deg,#000000,#333333);padding:24px 20px 20px;color:#fff}
+  .sidebar-title{font-size:20px;font-weight:900;margin-bottom:2px}
+  .sidebar-sub{font-size:12px;opacity:0.85}
+  .sidebar-menu{flex:1;padding:10px 0}
+  .sidebar-item{display:flex;align-items:center;gap:14px;padding:14px 20px;font-size:15px;font-weight:700;color:#333;cursor:pointer;transition:background 0.15s;border-left:3px solid transparent}
+  .sidebar-item:hover{background:#f0f0f0;border-left-color:#000000;color:#000000}
+  .sidebar-item.active{background:#f0f0f0;border-left-color:#000000;color:#000000}
+  .sidebar-icon{font-size:20px;width:24px;text-align:center}
+  .sidebar-footer{padding:16px 20px;border-top:1px solid #eee;font-size:11px;color:#aaa;text-align:center}
+
+  /* MODAL PANELS */
+  .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:300;display:none;align-items:flex-end;justify-content:center}
+  .modal-overlay.open{display:flex}
+  .modal-panel{background:#fff;border-radius:20px 20px 0 0;width:100%;max-width:480px;max-height:85vh;overflow-y:auto;padding:24px 20px;animation:slideUp 0.25s ease}
+  @keyframes slideUp{from{transform:translateY(60px);opacity:0}to{transform:translateY(0);opacity:1}}
+  .modal-title{font-size:18px;font-weight:900;color:#333;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between}
+  .modal-close{background:#f5f5f5;border:none;border-radius:8px;padding:6px 12px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif;color:#666}
+  .modal-close:hover{background:#eee}
+
+  /* HOW TO USE */
+  .how-step{display:flex;gap:12px;margin-bottom:14px;align-items:flex-start}
+  .how-num{background:#000000;color:#fff;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;flex-shrink:0;margin-top:2px}
+
+  /* SUPPORT */
+  .support-card{background:#f9f9f9;border-radius:14px;padding:16px;margin-bottom:12px}
+  .support-label{font-size:12px;color:#888;font-weight:700;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px}
+  .support-value{font-size:15px;font-weight:800;color:#333}
+  .support-link{display:block;margin-top:10px;padding:12px;background:linear-gradient(135deg,#000000,#333333);color:#fff;text-align:center;border-radius:10px;font-weight:800;font-size:14px;text-decoration:none}
+  .support-hours{font-size:13px;color:#888;text-align:center;margin-top:12px}
+
+  /* TRACKING */
+  .track-input-row{display:flex;gap:8px;margin-bottom:20px}
+  .track-input{flex:1;padding:12px 14px;border:1.5px solid #ddd;border-radius:10px;font-size:14px;font-family:'Nunito',sans-serif;outline:none}
+  .track-input:focus{border-color:#000000}
+  .track-btn{padding:12px 18px;background:linear-gradient(135deg,#000000,#333333);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;white-space:nowrap}
+  .track-not-found{background:#eeeeee;color:#000000;border-radius:10px;padding:14px;font-size:13px;font-weight:700;text-align:center}
+  .track-result{background:#f9f9f9;border-radius:14px;padding:16px}
+  .track-result-header{display:flex;align-items:center;gap:10px;margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid #eee}
+  .track-result-code{font-size:13px;font-weight:900;color:#000000;background:#eeeeee;padding:4px 10px;border-radius:20px}
+  .track-result-country{font-size:13px;color:#666;font-weight:600}
+  .track-items-list{font-size:13px;color:#555;margin-bottom:14px}
+  .track-item-row{display:flex;align-items:center;gap:6px;padding:4px 0}
+  /* TIMELINE */
+  .timeline{display:flex;flex-direction:column;gap:0}
+  .tl-step{display:flex;gap:14px;position:relative}
+  .tl-step:not(:last-child) .tl-line{position:absolute;left:15px;top:32px;width:2px;height:calc(100% - 8px);background:#eee;z-index:0}
+  .tl-step.done .tl-line{background:#22c55e}
+  .tl-step.active .tl-line{background:#000000}
+  .tl-dot{width:32px;height:32px;border-radius:50%;border:3px solid #eee;background:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;z-index:1;position:relative}
+  .tl-step.done .tl-dot{border-color:#22c55e;background:#22c55e;color:#fff}
+  .tl-step.active .tl-dot{border-color:#000000;background:#000000;color:#fff}
+  .tl-content{padding:4px 0 20px}
+  .tl-title{font-size:14px;font-weight:800;color:#333}
+  .tl-step.done .tl-title{color:#22c55e}
+  .tl-step.active .tl-title{color:#000000}
+  .tl-desc{font-size:12px;color:#888;margin-top:2px}
+
+  /* PROGRESS BAR */
+  .progress-bar{background:#fff;padding:12px 20px;display:flex;align-items:center;border-bottom:1px solid #eee}
+  .step{display:flex;align-items:center;gap:6px;font-size:12px;color:#aaa;font-weight:600}
+  .step.active{color:#000000} .step.done{color:#22c55e}
+  .step-num{width:22px;height:22px;border-radius:50%;background:#eee;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700}
+  .step.active .step-num{background:#000000;color:#fff} .step.done .step-num{background:#22c55e;color:#fff}
+  .step-sep{flex:1;height:2px;background:#eee;margin:0 6px} .step-sep.done{background:#22c55e}
+
+  /* SCREENS */
+  .screen{display:none;padding:20px} .screen.active{display:block}
+  .section-title{font-size:16px;font-weight:800;color:#333;margin-bottom:6px}
+  .section-sub{font-size:13px;color:#888;margin-bottom:18px}
+  .gender-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:24px}
+  .gender-card{background:#fff;border:2px solid #eee;border-radius:16px;padding:24px 16px;text-align:center;cursor:pointer;transition:all 0.18s}
+  .gender-card:hover{border-color:#000000;transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,0.13)}
+  .gender-card.selected{border-color:#000000;background:#f0f0f0}
+  .gender-icon{font-size:42px;margin-bottom:8px}
+  .gender-label{font-size:15px;font-weight:800;color:#333}
+  .gender-card.selected .gender-label{color:#000000}
+  .select-wrapper{position:relative;margin-bottom:20px}
+  .select-trigger{width:100%;padding:13px 16px;background:#fff;border:2px solid #ddd;border-radius:12px;font-size:14px;font-family:'Nunito',sans-serif;font-weight:700;color:#333;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:10px;transition:border 0.15s;user-select:none}
+  .select-trigger:hover,.select-trigger.open{border-color:#000000}
+  .select-trigger-left{display:flex;align-items:center;gap:10px}
+  .select-flag{font-size:22px} .select-placeholder{color:#aaa;font-weight:600}
+  .select-arrow{font-size:12px;color:#aaa;transition:transform 0.2s}
+  .select-trigger.open .select-arrow{transform:rotate(180deg)}
+  .dropdown-menu{position:absolute;top:calc(100% + 6px);left:0;right:0;background:#fff;border:2px solid #000000;border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,0.12);z-index:100;overflow:hidden;display:none}
+  .dropdown-menu.open{display:block}
+  .dropdown-search-wrap{padding:10px 12px;border-bottom:1px solid #f0f0f0}
+  .dropdown-search{width:100%;padding:9px 12px;border:1.5px solid #ddd;border-radius:8px;font-size:13px;font-family:'Nunito',sans-serif;outline:none}
+  .dropdown-search:focus{border-color:#000000}
+  .dropdown-list{max-height:240px;overflow-y:auto}
+  .dropdown-item{padding:10px 14px;display:flex;align-items:center;gap:10px;cursor:pointer;font-size:13px;font-weight:700;color:#333;transition:background 0.1s}
+  .dropdown-item:hover{background:#f0f0f0} .dropdown-item.selected{background:#f0f0f0;color:#000000}
+  .dropdown-item-flag{font-size:20px}
+  .dropdown-empty{padding:16px;text-align:center;font-size:13px;color:#bbb}
+  .cat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;margin-bottom:16px}
+  .cat-card{background:#fff;border:2px solid #eee;border-radius:12px;padding:16px 10px;text-align:center;cursor:pointer;transition:all 0.15s}
+  .cat-card:hover,.cat-card.selected{border-color:#000000;background:#f0f0f0}
+  .cat-icon{font-size:28px;margin-bottom:6px}
+  .cat-label{font-size:11px;font-weight:700;color:#444}
+  .cat-card.selected .cat-label{color:#000000}
+  .items-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-bottom:14px}
+  .item-card{background:#fff;border:2px solid #eee;border-radius:12px;padding:14px 10px;text-align:center;cursor:pointer;transition:all 0.15s}
+  .item-card:hover,.item-card.selected{border-color:#000000;background:#f0f0f0}
+  .item-icon{font-size:26px;margin-bottom:6px}
+  .item-name{font-size:12px;font-weight:700;color:#333}
+  .item-badge{display:inline-block;background:#fee2e2;color:#dc2626;font-size:9px;font-weight:700;padding:2px 6px;border-radius:20px;margin-top:4px}
+  .size-section{background:#fff;border-radius:14px;padding:14px;margin-bottom:14px}
+  .size-label{font-size:13px;font-weight:700;color:#555;margin-bottom:10px}
+  .size-grid{display:flex;flex-wrap:wrap;gap:8px}
+  .size-btn{min-width:44px;height:44px;padding:0 10px;border:2px solid #ddd;border-radius:8px;background:#fff;font-size:13px;font-weight:700;color:#444;cursor:pointer;transition:all 0.12s}
+  .size-btn:hover{border-color:#000000;color:#000000} .size-btn.selected{border-color:#000000;background:#000000;color:#fff}
+  .add-btn{width:100%;padding:13px;background:#eeeeee;color:#000000;border:2px dashed #000000;border-radius:12px;font-size:14px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;margin-bottom:10px;transition:all 0.15s}
+  .add-btn:hover{background:#fff} .add-btn:disabled{opacity:0.4;cursor:not-allowed}
+  .cart-section{background:#fff;border-radius:14px;padding:16px;margin-bottom:14px}
+  .cart-title{font-size:13px;font-weight:800;color:#555;margin-bottom:10px}
+  .cart-item{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid #f3f3f3;font-size:13px}
+  .cart-item:last-child{border-bottom:none}
+  .cart-item-info{display:flex;align-items:center;gap:8px}
+  .cart-item-icon{font-size:20px}
+  .cart-item-name{font-weight:700;color:#333}
+  .cart-item-size{font-size:11px;color:#888;font-weight:600;margin-top:2px}
+  .cart-remove{background:#fee2e2;color:#dc2626;border:none;border-radius:6px;padding:5px 10px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif}
+  .cart-empty{font-size:13px;color:#bbb;text-align:center;padding:10px 0}
+  .form-card{background:#fff;border-radius:14px;padding:18px;margin-bottom:16px}
+  .form-row{margin-bottom:14px} .form-row:last-child{margin-bottom:0}
+  .form-label{font-size:13px;font-weight:700;color:#555;margin-bottom:6px;display:block}
+  .form-input{width:100%;padding:11px 14px;border:1.5px solid #ddd;border-radius:10px;font-size:14px;font-family:'Nunito',sans-serif;outline:none;transition:border 0.15s}
+  .form-input:focus{border-color:#000000}
+  .form-row-2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+  .summary-items{background:#fff;border-radius:14px;padding:16px;margin-bottom:16px}
+  .sum-item-row{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid #f3f3f3;font-size:13px}
+  .sum-item-row:last-child{border-bottom:none}
+  .sum-item-text{font-weight:700;color:#333;flex:1}
+  .sum-item-tag{background:#eeeeee;color:#000000;font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px}
+  .country-selected-badge{display:flex;align-items:center;gap:8px;background:#f0f0f0;border:2px solid #000000;border-radius:10px;padding:10px 14px;margin-bottom:16px;font-size:14px;font-weight:700;color:#333}
+  .btn-primary{width:100%;padding:15px;background:linear-gradient(135deg,#000000,#333333);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;transition:opacity 0.15s,background 0.2s;margin-bottom:10px}
+  .btn-primary:hover:not(:disabled){opacity:0.92}
+  .btn-primary:disabled{background:#bbb;color:#fff;cursor:not-allowed;opacity:1}
+  .btn-secondary{width:100%;padding:13px;background:#fff;color:#000000;border:2px solid #000000;border-radius:12px;font-size:14px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;margin-bottom:10px}
+  .btn-secondary:hover{background:#f0f0f0}
+  .btn-back{width:100%;padding:12px;background:#f5f5f5;color:#666;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif}
+  .btn-back:hover{background:#eee}
+  .hint-text{font-size:12px;color:#aaa;text-align:center;margin-bottom:10px;margin-top:-4px}
+
+  /* TRACKING CODE BOX */
+  .tracking-box{background:#fff;border:2px solid #000000;border-radius:14px;padding:16px;margin-top:16px;text-align:center}
+  .tracking-box-label{font-size:12px;color:#888;font-weight:700;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px}
+  .tracking-code-display{font-size:20px;font-weight:900;color:#000000;letter-spacing:2px;margin-bottom:10px}
+  .copy-btn{background:#f5f5f5;border:none;border-radius:8px;padding:8px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif;color:#555;transition:all 0.15s}
+  .copy-btn:hover{background:#eee}
+  .copy-btn.copied{background:#22c55e;color:#fff}
+
+  /* SUCCESS */
+  .success-screen{text-align:center;padding:40px 20px}
+  .success-icon{font-size:70px;margin-bottom:16px}
+  .success-title{font-size:22px;font-weight:900;color:#22c55e;margin-bottom:10px}
+  .success-msg{font-size:14px;color:#666;line-height:1.7;margin-bottom:16px}
+  .delivery-badge{display:inline-block;background:linear-gradient(135deg,#000000,#333333);color:#fff;font-size:15px;font-weight:800;padding:12px 28px;border-radius:30px;margin-bottom:16px}
+  .order-id{font-size:12px;color:#aaa;margin-bottom:28px}
+  .success-items{background:#f9f9f9;border-radius:12px;padding:14px;margin-bottom:20px;text-align:left}
+  .success-item{font-size:13px;color:#444;padding:6px 0;border-bottom:1px solid #eee;display:flex;align-items:center;gap:8px}
+  .success-item:last-child{border-bottom:none}
+
+  /* LOADING SCREEN */
+  .loading-screen{text-align:center;padding:60px 20px}
+  .loading-spinner{width:64px;height:64px;border:5px solid #f3f3f3;border-top:5px solid #000000;border-radius:50%;animation:spin 0.9s linear infinite;margin:0 auto 28px}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .loading-title{font-size:18px;font-weight:900;color:#333;margin-bottom:8px}
+  .loading-sub{font-size:13px;color:#888;line-height:1.6}
+  .loading-dots span{display:inline-block;animation:blink 1.2s infinite;font-size:20px;color:#000000}
+  .loading-dots span:nth-child(2){animation-delay:0.2s}
+  .loading-dots span:nth-child(3){animation-delay:0.4s}
+  @keyframes blink{0%,80%,100%{opacity:0}40%{opacity:1}}
+
+  /* BLOCKED SCREEN */
+  .blocked-screen{text-align:center;padding:60px 20px}
+  .blocked-icon{font-size:64px;margin-bottom:16px}
+  .blocked-title{font-size:20px;font-weight:900;color:#000000;margin-bottom:10px}
+  .blocked-msg{font-size:14px;color:#666;line-height:1.7;max-width:300px;margin:0 auto}
+
+  /* MEUS PEDIDOS */
+  .order-card{background:#f9f9f9;border-radius:14px;padding:16px;margin-bottom:14px}
+  .order-card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid #eee}
+  .order-card-date{font-size:11px;color:#aaa;font-weight:600}
+  .order-card-country{font-size:13px;font-weight:700;color:#555}
+  .order-card-items{margin-bottom:12px}
+  .order-card-item{display:flex;align-items:center;gap:8px;font-size:13px;color:#444;padding:4px 0}
+  .order-card-tracking{background:#fff;border:1.5px solid #000000;border-radius:10px;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .order-card-tracking-label{font-size:11px;color:#888;font-weight:700;text-transform:uppercase;letter-spacing:0.4px;margin-bottom:2px}
+  .order-card-tracking-code{font-size:15px;font-weight:900;color:#000000;letter-spacing:1px}
+  .order-card-copy{background:#eeeeee;border:none;border-radius:6px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;color:#000000;font-family:'Nunito',sans-serif;white-space:nowrap;flex-shrink:0}
+  .order-card-copy:hover{background:#e5e5e5}
+  .order-card-copy.copied{background:#22c55e;color:#fff}
+  .orders-empty{text-align:center;padding:32px 0;font-size:14px;color:#bbb}
+
+  /* BANNER CONTADOR */
+  .promo-banner{background:linear-gradient(135deg,#000000,#333333);color:#fff;padding:10px 20px;text-align:center;font-size:13px;font-weight:800;letter-spacing:0.3px}
+
+  /* PROVA SOCIAL TICKER */
+  .social-proof{background:#fff;border-bottom:1px solid #eee;padding:8px 0;overflow:hidden;position:relative}
+  .social-proof::before,.social-proof::after{content:'';position:absolute;top:0;width:40px;height:100%;z-index:2}
+  .social-proof::before{left:0;background:linear-gradient(to right,#fff,transparent)}
+  .social-proof::after{right:0;background:linear-gradient(to left,#fff,transparent)}
+  .ticker-track{display:flex;gap:0;animation:ticker 30s linear infinite;width:max-content}
+  .ticker-item{display:flex;align-items:center;gap:6px;padding:0 22px;font-size:12px;font-weight:700;color:#555;white-space:nowrap}
+  .ticker-dot{width:7px;height:7px;border-radius:50%;background:#22c55e;flex-shrink:0;animation:pulse 1.5s infinite}
+  @keyframes ticker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+
+  /* SELOS DE SEGURANÇA */
+  .seals-row{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+  .seal{display:flex;align-items:center;gap:5px;background:#f0fdf4;border:1.5px solid #bbf7d0;border-radius:20px;padding:6px 11px;font-size:11px;font-weight:800;color:#15803d}
+
+  /* TIMELINE DO PEDIDO */
+  .order-timeline{margin-top:14px;padding-top:12px;border-top:1px solid #eee}
+  .order-tl-title{font-size:11px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px}
+  .order-tl-steps{display:flex;align-items:flex-start}
+  .order-tl-step{display:flex;flex-direction:column;align-items:center;flex:1;position:relative}
+  .order-tl-step:not(:last-child)::after{content:'';position:absolute;top:10px;left:50%;width:100%;height:2px;background:#eee;z-index:0}
+  .order-tl-step.done:not(:last-child)::after{background:#22c55e}
+  .order-tl-dot{width:20px;height:20px;border-radius:50%;border:2.5px solid #eee;background:#fff;z-index:1;display:flex;align-items:center;justify-content:center;font-size:9px;flex-shrink:0}
+  .order-tl-step.done .order-tl-dot{border-color:#22c55e;background:#22c55e;color:#fff}
+  .order-tl-step.active .order-tl-dot{border-color:#000000;background:#000000;color:#fff}
+  .order-tl-label{font-size:9px;font-weight:700;color:#aaa;margin-top:4px;text-align:center;line-height:1.3}
+  .order-tl-step.done .order-tl-label{color:#22c55e}
+  .order-tl-step.active .order-tl-label{color:#000000}
+
+  /* COUNTDOWN */
+  .countdown-box{background:#fff5ee;border:1.5px solid #fed7aa;border-radius:12px;padding:12px 16px;margin:16px 0;text-align:center}
+  .countdown-label{font-size:11px;color:#92400e;font-weight:700;text-transform:uppercase;letter-spacing:0.4px;margin-bottom:8px}
+  .countdown-timer{display:flex;justify-content:center;gap:8px}
+  .countdown-unit{background:#fff;border-radius:8px;padding:6px 10px;min-width:46px;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,0.08)}
+  .countdown-num{font-size:22px;font-weight:900;color:#000000;line-height:1}
+  .countdown-name{font-size:9px;font-weight:700;color:#aaa;text-transform:uppercase;margin-top:2px}
+
+  /* ── RESPONSIVO MOBILE ──────────────────────────────────────── */
+  @media (max-width: 480px) {
+
+    /* GERAL */
+    body{font-size:14px}
+    .screen{padding:14px}
+
+    /* HEADER */
+    .header{padding:10px 14px}
+    .header-logo{font-size:17px}
+    .header-sub{font-size:10px}
+    .menu-btn{padding:6px 9px;font-size:16px}
+    .cart-badge{font-size:12px;padding:4px 10px}
+
+    /* BANNER & TICKER */
+    .promo-banner{font-size:12px;padding:8px 14px}
+    .ticker-item{font-size:11px;padding:0 16px}
+
+    /* PROGRESS BAR */
+    .progress-bar{padding:10px 14px;overflow-x:auto}
+    .step{font-size:10px;gap:4px;white-space:nowrap}
+    .step-num{width:18px;height:18px;font-size:10px}
+    .step-sep{margin:0 4px}
+
+    /* SECTION TITLES */
+    .section-title{font-size:15px}
+    .section-sub{font-size:12px;margin-bottom:14px}
+
+    /* GENDER GRID */
+    .gender-grid{gap:10px;margin-bottom:18px}
+    .gender-card{padding:18px 12px;border-radius:12px}
+    .gender-icon{font-size:36px;margin-bottom:6px}
+    .gender-label{font-size:14px}
+
+    /* SELECT / DROPDOWN */
+    .select-trigger{padding:11px 13px;font-size:13px}
+    .select-flag{font-size:19px}
+    .dropdown-list{max-height:200px}
+    .dropdown-item{font-size:12px;padding:9px 12px}
+    .dropdown-item-flag{font-size:18px}
+
+    /* CATEGORIES */
+    .cat-grid{grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+    .cat-card{padding:12px 6px;border-radius:10px}
+    .cat-icon{font-size:24px;margin-bottom:4px}
+    .cat-label{font-size:10px}
+
+    /* ITEMS GRID */
+    .items-grid{grid-template-columns:repeat(3,1fr);gap:8px}
+    .item-card{padding:11px 7px;border-radius:10px}
+    .item-icon{font-size:22px;margin-bottom:4px}
+    .item-name{font-size:11px}
+    .item-badge{font-size:8px;padding:2px 5px}
+
+    /* SIZE BUTTONS */
+    .size-section{padding:12px}
+    .size-btn{min-width:40px;height:40px;font-size:12px}
+
+    /* ADD BUTTON */
+    .add-btn{padding:12px;font-size:13px}
+
+    /* CART */
+    .cart-section{padding:13px}
+    .cart-item{font-size:12px}
+    .cart-item-icon{font-size:18px}
+    .cart-remove{padding:4px 8px;font-size:11px}
+
+    /* FORM */
+    .form-card{padding:14px}
+    .form-input{padding:10px 12px;font-size:13px}
+    .form-label{font-size:12px}
+    .form-row-2{grid-template-columns:1fr 1fr;gap:8px}
+
+    /* SUMMARY */
+    .summary-items{padding:13px}
+    .sum-item-row{font-size:12px}
+    .country-selected-badge{font-size:13px;padding:9px 12px}
+
+    /* SELOS */
+    .seals-row{gap:6px}
+    .seal{font-size:10px;padding:5px 9px}
+
+    /* BUTTONS */
+    .btn-primary{padding:13px;font-size:14px}
+    .btn-secondary{padding:11px;font-size:13px}
+    .btn-back{padding:10px;font-size:13px}
+
+    /* SUCCESS */
+    .success-screen{padding:28px 14px}
+    .success-icon{font-size:58px}
+    .success-title{font-size:19px}
+    .delivery-badge{font-size:13px;padding:10px 20px}
+    .tracking-code-display{font-size:17px;letter-spacing:1px}
+
+    /* COUNTDOWN */
+    .countdown-box{padding:10px 12px}
+    .countdown-unit{min-width:40px;padding:5px 8px}
+    .countdown-num{font-size:19px}
+    .countdown-name{font-size:8px}
+    .countdown-timer{gap:6px}
+
+    /* LOADING */
+    .loading-screen{padding:48px 16px}
+    .loading-spinner{width:52px;height:52px}
+    .loading-title{font-size:16px}
+    .loading-sub{font-size:12px}
+
+    /* BLOCKED */
+    .blocked-screen{padding:48px 16px}
+    .blocked-icon{font-size:52px}
+    .blocked-title{font-size:18px}
+    .blocked-msg{font-size:13px}
+
+    /* ORDER CARD */
+    .order-card{padding:13px}
+    .order-card-tracking{flex-direction:column;align-items:flex-start;gap:8px}
+    .order-card-tracking-code{font-size:14px}
+    .order-card-copy{align-self:stretch;text-align:center;padding:8px}
+
+    /* ORDER TIMELINE */
+    .order-tl-label{font-size:8px}
+    .order-tl-dot{width:17px;height:17px;font-size:8px}
+
+    /* MODAL */
+    .modal-panel{padding:20px 16px;max-height:90vh}
+    .modal-title{font-size:16px}
+
+    /* SIDEBAR */
+    .sidebar{width:260px}
+    .sidebar-title{font-size:18px}
+    .sidebar-item{font-size:14px;padding:13px 16px}
+
+    /* TRACKING MODAL */
+    .track-input-row{gap:6px}
+    .track-input{padding:10px 12px;font-size:13px}
+    .track-btn{padding:10px 13px;font-size:13px}
+
+    /* SUPPORT */
+    .support-value{font-size:13px;word-break:break-all}
+  }
+
+  @media (max-width: 360px) {
+    .cat-grid{grid-template-columns:repeat(3,1fr)}
+    .items-grid{grid-template-columns:repeat(2,1fr)}
+    .seals-row{flex-direction:column;align-items:center}
+    .countdown-timer{gap:4px}
+    .countdown-unit{min-width:36px;padding:4px 6px}
+    .countdown-num{font-size:17px}
+  }
+  /* ── LOGIN SCREEN ───────────────────────────────────────────── */
+  #loginScreen{position:fixed;inset:0;background:linear-gradient(160deg,#000000 0%,#333333 55%,#666666 100%);z-index:999;display:flex;align-items:center;justify-content:center;padding:20px}
+  #loginScreen.hidden{display:none}
+  #loginScreen::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 15% 15%,rgba(255,255,255,0.12) 0%,transparent 55%),radial-gradient(circle at 85% 85%,rgba(255,255,255,0.08) 0%,transparent 55%);pointer-events:none}
+  .login-box{background:#fff;border-radius:28px;padding:40px 28px 32px;width:100%;max-width:380px;box-shadow:0 28px 80px rgba(0,0,0,0.28);text-align:center;position:relative}
+  .login-box::before{content:'🛍️';position:absolute;top:-30px;left:50%;transform:translateX(-50%);font-size:52px;filter:drop-shadow(0 6px 16px rgba(0,0,0,0.25))}
+  .login-logo{display:none}
+  .login-brand{font-size:28px;font-weight:900;color:#000000;margin-bottom:2px;margin-top:10px;letter-spacing:-0.5px}
+  .login-stars{color:#f59e0b;font-size:14px;letter-spacing:2px;margin-bottom:4px}
+  .login-trust{font-size:11px;color:#bbb;margin-bottom:20px;font-weight:600}
+  .login-tagline{font-size:11px;color:#000000;font-weight:800;margin-bottom:24px;letter-spacing:1px;text-transform:uppercase;background:#eeeeee;border-radius:20px;display:inline-block;padding:4px 14px}
+  .login-field{margin-bottom:14px;text-align:left}
+  .login-label{font-size:12px;font-weight:700;color:#555;margin-bottom:6px;display:block;text-transform:uppercase;letter-spacing:0.4px}
+  .login-input{width:100%;padding:13px 16px;border:1.5px solid #e5e5e5;border-radius:12px;font-size:14px;font-family:'Nunito',sans-serif;outline:none;transition:border 0.2s;color:#333;background:#fafafa}
+  .login-input:focus{border-color:#000000;background:#fff;box-shadow:0 0 0 3px rgba(0,0,0,0.08)}
+  .login-input.error{border-color:#ef4444;background:#fff5f5}
+  .login-input-wrap{position:relative}
+  .login-eye{position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;color:#aaa;padding:0;line-height:1}
+  .login-error{background:#fff2ee;border:1px solid #fca5a5;color:#dc2626;border-radius:10px;padding:10px 14px;font-size:13px;font-weight:700;margin-bottom:14px;display:none;text-align:left}
+  .login-error.show{display:block}
+  .login-btn{width:100%;padding:15px;background:linear-gradient(135deg,#000000,#333333);color:#fff;border:none;border-radius:14px;font-size:16px;font-weight:900;cursor:pointer;font-family:'Nunito',sans-serif;margin-top:6px;transition:all 0.15s;letter-spacing:0.3px;box-shadow:0 6px 20px rgba(0,0,0,0.4)}
+  .login-btn:hover{opacity:0.93;transform:translateY(-1px);box-shadow:0 8px 24px rgba(0,0,0,0.45)}
+  .login-btn:disabled{opacity:0.6;cursor:not-allowed;transform:none}
+  .login-divider{font-size:11px;color:#ddd;margin:16px 0 12px;display:flex;align-items:center;gap:10px}
+  .login-divider::before,.login-divider::after{content:'';flex:1;height:1px;background:#eee}
+  .login-badges{display:flex;justify-content:center;gap:16px;margin-bottom:12px}
+  .login-badge{display:flex;align-items:center;gap:4px;font-size:10px;color:#aaa;font-weight:700}
+  .login-footer{font-size:11px;color:#bbb;line-height:1.6}
+  .login-footer a{color:#000000;font-weight:700;text-decoration:none}
+
+  @media(max-width:480px){
+    .login-box{padding:32px 18px 26px;border-radius:22px}
+    .login-brand{font-size:24px}
+  }
+</style>
+</head>
+<body>
+
+<!-- ══ PANTALLA DE LOGIN ════════════════════════════════════ -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="login-brand">ZARA 50 AÑOS</div>
+    <div class="login-stars">★★★★★</div>
+    <div class="login-trust">+3.847 clientes satisfechos</div>
+    <div class="login-tagline">🎉 Shop like a billionaire</div>
+
+    <div class="login-error" id="loginError"></div>
+
+    <div class="login-field">
+      <label class="login-label" for="loginEmail">📧 E-mail de tu compra</label>
+      <input class="login-input" id="loginEmail" type="email" placeholder="tuemail@ejemplo.com" autocomplete="email" oninput="clearLoginError()">
+    </div>
+
+    <div class="login-field">
+      <label class="login-label" for="loginPassword">🔒 Contraseña</label>
+      <div class="login-input-wrap">
+        <input class="login-input" id="loginPassword" type="password" placeholder="••••••" autocomplete="current-password" oninput="clearLoginError()" onkeydown="if(event.key==='Enter')doLogin()">
+        <button class="login-eye" onclick="toggleLoginPassword()" id="loginEyeBtn">👁️</button>
+      </div>
+    </div>
+
+    <button class="login-btn" id="loginBtn" onclick="doLogin()">
+      <span id="loginBtnText">Canjear Premios →</span>
+      <span id="loginBtnLoading" style="display:none">Verificando...</span>
+    </button>
+
+    <div class="login-divider">acceso seguro</div>
+    <div class="login-badges">
+      <div class="login-badge">🔒 SSL Seguro</div>
+      <div class="login-badge">✅ Datos Protegidos</div>
+      <div class="login-badge">📦 Entrega Garantizada</div>
+    </div>
+    <div class="login-footer">
+      ¿Problemas para acceder? <a href="mailto:suportzara50anos@gmail.com">Hablar con soporte</a>
+    </div>
+  </div>
+</div>
+
+<!-- SIDEBAR OVERLAY -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+<!-- SIDEBAR -->
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-title">🛍️ ZARA 50 AÑOS</div>
+    <div class="sidebar-sub">Shop like a billionaire 🎉</div>
+  </div>
+  <div class="sidebar-menu">
+    <div class="sidebar-item active" onclick="closeSidebar();goStep(1)"><span class="sidebar-icon">🏠</span>Dashboard</div>
+    <div class="sidebar-item" onclick="closeSidebar();openModal('modalOrders')"><span class="sidebar-icon">🧾</span>Mis Pedidos</div>
+    <div class="sidebar-item" onclick="closeSidebar();openModal('modalHow')"><span class="sidebar-icon">📖</span>Cómo Usar</div>
+    <div class="sidebar-item" onclick="closeSidebar();openModal('modalSupport')"><span class="sidebar-icon">🎧</span>Soporte</div>
+    <div class="sidebar-item" onclick="closeSidebar();openModal('modalTracking')"><span class="sidebar-icon">📦</span>Rastreo</div>
+  </div>
+  <div class="sidebar-footer">ZARA 50 AÑOS © 2025</div>
+</div>
+
+<!-- MODAL: MEUS PEDIDOS -->
+<div class="modal-overlay" id="modalOrders" onclick="closeModalOutside(event,'modalOrders')">
+  <div class="modal-panel">
+    <div class="modal-title">Mis Pedidos <button class="modal-close" onclick="closeModal('modalOrders')">Cerrar</button></div>
+    <div id="ordersContent"></div>
+  </div>
+</div>
+
+<!-- MODAL: HOW TO USE -->
+<div class="modal-overlay" id="modalHow" onclick="closeModalOutside(event,'modalHow')">
+  <div class="modal-panel">
+    <div class="modal-title">Cómo Usar <button class="modal-close" onclick="closeModal('modalHow')">Cerrar</button></div>
+    <p style="margin-bottom:12px">¡Bienvenido a <strong>ZARA 50 AÑOS</strong>! Mira cómo canjear tu premio en 4 simples pasos:</p>
+<div class="how-step"><div class="how-num">1</div><div><strong>Elige el género</strong><br>Selecciona Masculino o Femenino y el país de entrega.</div></div>
+<div class="how-step"><div class="how-num">2</div><div><strong>Elige los productos</strong><br>Navega por las categorías, selecciona los artículos deseados y la talla cuando sea necesario.</div></div>
+<div class="how-step"><div class="how-num">3</div><div><strong>Revisa el carrito</strong><br>Confirma todos los artículos seleccionados antes de continuar.</div></div>
+<div class="how-step"><div class="how-num">4</div><div><strong>Completa la dirección</strong><br>Ingresa tus datos de entrega. Después de confirmar, recibirás un código de rastreo único para seguir tu pedido.</div></div>
+<p style="margin-top:14px;font-size:13px;color:#888;">El plazo de entrega es de <strong>20 a 35 días hábiles</strong> después de la confirmación del pedido.</p>
+  </div>
+</div>
+
+<!-- MODAL: SUPPORT -->
+<div class="modal-overlay" id="modalSupport" onclick="closeModalOutside(event,'modalSupport')">
+  <div class="modal-panel">
+    <div class="modal-title">Soporte <button class="modal-close" onclick="closeModal('modalSupport')">Cerrar</button></div>
+    <div class="support-card">
+      <div class="support-label">Correo de soporte</div>
+      <div class="support-value">✉️ suportzara50anos@gmail.com</div>
+    </div>
+    <div class="support-card">
+      <div class="support-label">Solicitar reembolso</div>
+      <a class="support-link" href="https://educahoy.online/reembolso/" target="_blank">🔗 Acceder al formulario de reembolso</a>
+    </div>
+    <div class="support-hours">🕐 Atención: Lunes a Viernes, 9h a 18h</div>
+  </div>
+</div>
+
+<!-- MODAL: TRACKING -->
+<div class="modal-overlay" id="modalTracking" onclick="closeModalOutside(event,'modalTracking')">
+  <div class="modal-panel">
+    <div class="modal-title">Rastrear Pedido <button class="modal-close" onclick="closeModal('modalTracking')">Cerrar</button></div>
+    <div class="track-input-row">
+      <input class="track-input" id="trackInput" type="text" placeholder="Ingresa tu código de rastreo..." oninput="this.value=this.value.toUpperCase()">
+      <button class="track-btn" onclick="doTrack()">Rastrear</button>
+    </div>
+    <div id="trackResult"></div>
+  </div>
+</div>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-left">
+    <button class="menu-btn" onclick="openSidebar()">☰</button>
+    <div><div class="header-logo">🛍️ ZARA 50 AÑOS</div><div class="header-sub">Shop like a billionaire 🎉</div></div>
+  </div>
+  <div class="cart-badge" onclick="goStep(3)" id="cartBtn" style="display:none">🛒 <span id="cartCount">0</span></div>
+</div>
+
+<!-- BANNER CONTADOR -->
+<div class="promo-banner">🔥 <strong id="rescueCounter">3.847</strong> premios ya canjeados! <span>Aprovecha mientras haya stock.</span></div>
+
+<!-- PROVA SOCIAL TICKER -->
+<div class="social-proof" id="socialProof">
+  <div class="ticker-track" id="tickerTrack"></div>
+</div>
+
+<div class="progress-bar" id="progressBar">
+  <div class="step active" id="s1"><div class="step-num">1</div> Inicio</div>
+  <div class="step-sep" id="sep1"></div>
+  <div class="step" id="s2"><div class="step-num">2</div> Productos</div>
+  <div class="step-sep" id="sep2"></div>
+  <div class="step" id="s3"><div class="step-num">3</div> Carrito</div>
+  <div class="step-sep" id="sep3"></div>
+  <div class="step" id="s4"><div class="step-num">4</div> Confirmar</div>
+</div>
+
+<!-- STEP 1 -->
+<div class="screen active" id="screen1">
+  <div class="section-title">¿Para quién es el premio?</div>
+  <div class="section-sub">Elige el género</div>
+  <div class="gender-grid">
+    <div class="gender-card" onclick="selectGender('hombre',this)"><div class="gender-icon">👨</div><div class="gender-label">Masculino</div></div>
+    <div class="gender-card" onclick="selectGender('mujer',this)"><div class="gender-icon">👩</div><div class="gender-label">Femenino</div></div>
+  </div>
+  <div class="section-title">País de entrega</div>
+  <div class="section-sub" style="margin-top:6px">Selecciona tu país</div>
+  <div class="select-wrapper" id="selectWrapper">
+    <div class="select-trigger" id="selectTrigger" onclick="toggleDropdown()">
+      <div class="select-trigger-left"><span class="select-flag" id="triggerFlag">🌎</span><span id="triggerLabel" class="select-placeholder">Selecciona el país...</span></div>
+      <span class="select-arrow">▼</span>
+    </div>
+    <div class="dropdown-menu" id="dropdownMenu">
+      <div class="dropdown-search-wrap"><input class="dropdown-search" type="text" placeholder="🔍 Buscar país..." oninput="filterDropdown(this.value)" id="dropSearch"></div>
+      <div class="dropdown-list" id="dropdownList"></div>
+    </div>
+  </div>
+  <div class="hint-text" id="hintText">Selecciona el género y el país para continuar</div>
+  <button class="btn-primary" id="btn1" disabled onclick="goStep(2)">Continuar →</button>
+</div>
+
+<!-- STEP 2 -->
+<div class="screen" id="screen2">
+  <div class="section-title">Elige tus premios</div>
+  <div class="section-sub">Selecciona la categoría y agrega al carrito</div>
+  <div class="cat-grid" id="catGrid"></div>
+  <div id="itemArea" style="display:none">
+    <div class="section-title" id="itemTitle" style="font-size:14px;margin-bottom:10px"></div>
+    <div class="items-grid" id="itemsGrid"></div>
+    <div id="sizeSection" style="display:none">
+      <div class="size-section"><div class="size-label" id="sizeLabelText">Talla:</div><div class="size-grid" id="sizeGrid"></div></div>
+    </div>
+    <button class="add-btn" id="addBtn" disabled onclick="addToCart()">+ Agregar al carrito</button>
+  </div>
+  <div class="cart-section">
+    <div class="cart-title">🛒 Carrito <span id="cartCountLabel" style="color:#000000;font-weight:900"></span></div>
+    <div id="cartList"><div class="cart-empty">Ningún artículo agregado todavía</div></div>
+  </div>
+  <button class="btn-primary" id="btn2" disabled onclick="goStep(3)">Ver carrinho →</button>
+  <button class="btn-back" onclick="goStep(1)">← Volver</button>
+</div>
+
+<!-- STEP 3 -->
+<div class="screen" id="screen3">
+  <div class="section-title">Tu carrito</div>
+  <div class="section-sub">Revisa los artículos seleccionados</div>
+  <div class="cart-section"><div id="cartFull"></div></div>
+  <button class="btn-secondary" onclick="goStep(2)">+ Agregar más artículos</button>
+  <button class="btn-primary" onclick="goStep(4)">Continuar →</button>
+  <button class="btn-back" onclick="goStep(1)">← Volver al inicio</button>
+</div>
+
+<!-- STEP 4 -->
+<div class="screen" id="screen4">
+  <div class="section-title">Confirmar canje</div>
+  <div class="section-sub">Completa tu dirección de entrega</div>
+  <div class="seals-row">
+    <div class="seal">✅ Pedido Seguro</div>
+    <div class="seal">🔒 Datos Protegidos</div>
+    <div class="seal">📦 Entrega Garantizada</div>
+  </div>
+  <div class="country-selected-badge" id="countryBadge"></div>
+  <div class="summary-items" id="sumItems"></div>
+  <div class="form-card" id="addressForm"></div>
+  <button class="btn-primary" id="btn4" disabled onclick="finalizar()">🏆 Canjear Premios</button>
+  <button class="btn-back" onclick="goStep(3)">← Volver</button>
+</div>
+
+<!-- STEP 5: SUCCESS -->
+<div class="screen" id="screen5">
+  <div class="success-screen">
+    <div class="success-icon">🎉</div>
+    <div class="success-title">¡Premios Canjeados!</div>
+    <div class="delivery-badge">📦 Entrega en <span id="deliveryDays">20 a 35</span> días hábiles</div>
+    <div class="success-msg" id="successMsg"></div>
+    <div class="success-items" id="successItems"></div>
+    <div class="countdown-box">
+      <div class="countdown-label">⏳ El plazo máximo de entrega expira en</div>
+      <div class="countdown-timer" id="countdownTimer">
+        <div class="countdown-unit"><div class="countdown-num" id="cdDays">--</div><div class="countdown-name">Días</div></div>
+        <div class="countdown-unit"><div class="countdown-num" id="cdHours">--</div><div class="countdown-name">Horas</div></div>
+        <div class="countdown-unit"><div class="countdown-num" id="cdMins">--</div><div class="countdown-name">Min</div></div>
+        <div class="countdown-unit"><div class="countdown-num" id="cdSecs">--</div><div class="countdown-name">Seg</div></div>
+      </div>
+    </div>
+    <div class="tracking-box">
+      <div class="tracking-box-label">Tu código de rastreo:</div>
+      <div class="tracking-code-display" id="trackingCodeDisplay"></div>
+      <button class="copy-btn" id="copyBtn" onclick="copyCode()">Copiar</button>
+    </div>
+    <div class="order-id" id="orderId" style="margin-top:12px"></div>
+    <button class="btn-primary" onclick="resetar()" style="max-width:280px;margin:16px auto 0">Hacer nuevo canje</button>
+  </div>
+</div>
+
+<!-- TELA DE CARREGAMENTO -->
+<div class="screen" id="screenLoading">
+  <div class="loading-screen">
+    <div class="loading-spinner"></div>
+    <div class="loading-title">Confirmando tu pedido...</div>
+    <div class="loading-sub">Estamos procesando tu información.<br>Espera un momento.</div>
+    <div class="loading-dots" style="margin-top:18px"><span>●</span><span>●</span><span>●</span></div>
+  </div>
+</div>
+
+<!-- TELA BLOQUEADA (já canjeó) -->
+<div class="screen" id="screenBlocked">
+  <div class="blocked-screen">
+    <div class="blocked-icon">🔒</div>
+    <div class="blocked-title">Canje ya realizado</div>
+    <div class="blocked-msg">Detectamos que este dispositivo ya realizó un canje.<br><br>Cada dispositivo puede canjear solo <strong>una vez</strong>.</div>
+    <div id="blockedOrderInfo"></div>
+    <button class="btn-secondary" onclick="openModal('modalSupport')" style="max-width:280px;margin:16px auto 0">Hablar con Soporte</button>
+  </div>
+</div>
+
+<script>
+const countries=[{"code": "AR", "flag": "🇦🇷", "name": "Argentina", "fields": [{"id": "nombre", "label": "Nombre completo", "placeholder": "Tu nombre", "full": true}, {"id": "cp", "label": "Código Postal", "placeholder": "1234", "half": true}, {"id": "ciudad", "label": "Ciudad", "placeholder": "Buenos Aires", "half": true}, {"id": "provincia", "label": "Provincia", "placeholder": "Buenos Aires", "half": true}, {"id": "calle", "label": "Dirección", "placeholder": "Calle 123", "full": true}]}, {"code": "MX", "flag": "🇲🇽", "name": "México", "fields": [{"id": "nombre", "label": "Nombre completo", "placeholder": "Tu nombre", "full": true}, {"id": "cp", "label": "Código Postal", "placeholder": "06600", "half": true}, {"id": "ciudad", "label": "Ciudad", "placeholder": "Ciudad de México", "half": true}, {"id": "estado", "label": "Estado", "placeholder": "CDMX", "half": true}, {"id": "colonia", "label": "Colonia", "placeholder": "Centro Histórico", "half": true}, {"id": "calle", "label": "Dirección", "placeholder": "Av. Reforma 123", "full": true}]}, {"code": "CO", "flag": "🇨🇴", "name": "Colombia", "fields": [{"id": "nombre", "label": "Nombre completo", "placeholder": "Tu nombre", "full": true}, {"id": "cp", "label": "Código Postal", "placeholder": "110111", "half": true}, {"id": "ciudad", "label": "Ciudad", "placeholder": "Bogotá", "half": true}, {"id": "dpto", "label": "Departamento", "placeholder": "Cundinamarca", "half": true}, {"id": "barrio", "label": "Barrio", "placeholder": "La Candelaria", "half": true}, {"id": "calle", "label": "Dirección", "placeholder": "Cra 7 # 32-16", "full": true}]}, {"code": "CL", "flag": "🇨🇱", "name": "Chile", "fields": [{"id": "nombre", "label": "Nombre completo", "placeholder": "Tu nombre", "full": true}, {"id": "cp", "label": "Código Postal", "placeholder": "8320000", "half": true}, {"id": "ciudad", "label": "Ciudad", "placeholder": "Santiago", "half": true}, {"id": "region", "label": "Región", "placeholder": "Región Metropolitana", "full": true}, {"id": "calle", "label": "Dirección", "placeholder": "Av. Providencia 123", "full": true}]}, {"code": "PE", "flag": "🇵🇪", "name": "Perú", "fields": [{"id": "nombre", "label": "Nombre completo", "placeholder": "Tu nombre", "full": true}, {"id": "cp", "label": "Código Postal", "placeholder": "15001", "half": true}, {"id": "ciudad", "label": "Ciudad", "placeholder": "Lima", "half": true}, {"id": "distrito", "label": "Distrito", "placeholder": "Miraflores", "half": true}, {"id": "provincia", "label": "Provincia", "placeholder": "Lima", "half": true}, {"id": "calle", "label": "Dirección", "placeholder": "Av. Larco 123", "full": true}]}, {"code": "VE", "flag": "🇻🇪", "name": "Venezuela", "fields": [{"id": "nombre", "label": "Nombre completo", "placeholder": "Tu nombre", "full": true}, {"id": "cp", "label": "Código Postal", "placeholder": "1010", "half": true}, {"id": "ciudad", "label": "Ciudad", "placeholder": "Caracas", "half": true}, {"id": "estado", "label": "Estado", "placeholder": "Distrito Capital", "half": true}, {"id": "municipio", "label": "Municipio", "placeholder": "Libertador", "half": true}, {"id": "calle", "label": "Dirección", "placeholder": "Av. Libertador", "full": true}]}, {"code": "EC", "flag": "🇪🇨", "name": "Ecuador", "fields": [{"id": "nombre", "label": "Nombre completo", "placeholder": "Tu nombre", "full": true}, {"id": "cp", "label": "Código Postal", "placeholder": "170515", "half": true}, {"id": "ciudad", "label": "Ciudad", "placeholder": "Quito", "half": true}, {"id": "provincia", "label": "Provincia", "placeholder": "Pichincha", "half": true}, {"id": "barrio", "label": "Barrio", "placeholder": "La Mariscal", "half": true}, {"id": "calle", "label": "Dirección", "placeholder": "Av. Amazonas N123", "full": true}]}, {"code": "BO", "flag": "🇧🇴", "name": "Bolivia", "fields": [{"id": "nombre", "label": "Nombre completo", "placeholder": "Tu nombre", "full": true}, {"id": "ciudad", "label": "Ciudad", "placeholder": "La Paz", "half": true}, {"id": "dpto", "label": "Departamento", "placeholder": "La Paz", "half": true}, {"id": "zona", "label": "Zona/Barrio", "placeholder": "Miraflores", "full": true}, {"id": "calle", "label": "Dirección", "placeholder": "Calle Comercio 123", "full": true}]}, {"code": "PY", "flag": "🇵🇾", "name": "Paraguay", "fields": [{"id": "nombre", "label": "Nombre completo", "placeholder": "Tu nombre", "full": true}, {"id": "cp", "label": "Código Postal", "placeholder": "1209", "half": true}, {"id": "ciudad", "label": "Ciudad", "placeholder": "Asunción", "half": true}, {"id": "barrio", "label": "Barrio", "placeholder": "Villa Morra", "full": true}, {"id": "calle", "label": "Dirección", "placeholder": "Av. España 123", "full": true}]}, {"code": "UY", "flag": "🇺🇾", "name": "Uruguay", "fields": [{"id": "nombre", "label": "Nombre completo", "placeholder": "Tu nombre", "full": true}, {"id": "cp", "label": "Código Postal", "placeholder": "11000", "half": true}, {"id": "ciudad", "label": "Ciudad", "placeholder": "Montevideo", "half": true}, {"id": "dpto", "label": "Departamento", "placeholder": "Montevideo", "half": true}, {"id": "barrio", "label": "Barrio", "placeholder": "Pocitos", "half": true}, {"id": "calle", "label": "Dirección", "placeholder": "Bvd. España 2023", "full": true}]}, {"code": "GT", "flag": "🇬🇹", "name": "Guatemala", "fields": [{"id": "nombre", "label": "Nombre completo", "placeholder": "Tu nombre", "full": true}, {"id": "cp", "label": "Código Postal", "placeholder": "01001", "half": true}, {"id": "ciudad", "label": "Ciudad", "placeholder": "Guatemala", "half": true}, {"id": "dpto", "label": "Departamento", "placeholder": "Guatemala", "half": true}, {"id": "municipio", "label": "Municipio", "placeholder": "Guatemala", "half": true}, {"id": "calle", "label": "Dirección", "placeholder": "6a Av. 5-55 Zona 1", "full": true}]}, {"code": "CR", "flag": "🇨🇷", "name": "Costa Rica", "fields": [{"id": "nombre", "label": "Nombre completo", "placeholder": "Tu nombre", "full": true}, {"id": "cp", "label": "Código Postal", "placeholder": "10101", "half": true}, {"id": "ciudad", "label": "Ciudad", "placeholder": "San José", "half": true}, {"id": "provincia", "label": "Provincia", "placeholder": "San José", "half": true}, {"id": "canton", "label": "Cantón", "placeholder": "San José", "half": true}, {"id": "calle", "label": "Referencia", "placeholder": "200m al norte del parque", "full": true}]}, {"code": "PA", "flag": "🇵🇦", "name": "Panamá", "fields": [{"id": "nombre", "label": "Nombre completo", "placeholder": "Tu nombre", "full": true}, {"id": "ciudad", "label": "Ciudad", "placeholder": "Ciudad de Panamá", "half": true}, {"id": "provincia", "label": "Provincia", "placeholder": "Panamá", "half": true}, {"id": "corr", "label": "Corregimiento", "placeholder": "Bella Vista", "full": true}, {"id": "calle", "label": "Dirección", "placeholder": "Av. Balboa", "full": true}]}, {"code": "HN", "flag": "🇭🇳", "name": "Honduras", "fields": [{"id": "nombre", "label": "Nombre completo", "placeholder": "Tu nombre", "full": true}, {"id": "cp", "label": "Código Postal", "placeholder": "11101", "half": true}, {"id": "ciudad", "label": "Ciudad", "placeholder": "Tegucigalpa", "half": true}, {"id": "dpto", "label": "Departamento", "placeholder": "Francisco Morazán", "half": true}, {"id": "colonia", "label": "Colonia", "placeholder": "Palmira", "half": true}, {"id": "calle", "label": "Dirección", "placeholder": "Blvd. Juan Pablo II", "full": true}]}, {"code": "DO", "flag": "🇩🇴", "name": "Rep. Dominicana", "fields": [{"id": "nombre", "label": "Nombre completo", "placeholder": "Tu nombre", "full": true}, {"id": "cp", "label": "Código Postal", "placeholder": "10101", "half": true}, {"id": "ciudad", "label": "Ciudad", "placeholder": "Santo Domingo", "half": true}, {"id": "provincia", "label": "Provincia", "placeholder": "Distrito Nacional", "half": true}, {"id": "sector", "label": "Sector", "placeholder": "Piantini", "half": true}, {"id": "calle", "label": "Dirección", "placeholder": "Av. Abraham Lincoln 456", "full": true}]}, {"code": "CU", "flag": "🇨🇺", "name": "Cuba", "fields": [{"id": "nombre", "label": "Nombre completo", "placeholder": "Tu nombre", "full": true}, {"id": "cp", "label": "Código Postal", "placeholder": "10400", "half": true}, {"id": "ciudad", "label": "Ciudad", "placeholder": "La Habana", "half": true}, {"id": "municipio", "label": "Municipio", "placeholder": "Plaza de la Revolución", "half": true}, {"id": "barrio", "label": "Barrio", "placeholder": "Vedado", "half": true}, {"id": "calle", "label": "Dirección", "placeholder": "Calle 23 #456", "full": true}]}, {"code": "PR", "flag": "🇵🇷", "name": "Puerto Rico", "fields": [{"id": "nombre", "label": "Nombre completo", "placeholder": "Tu nombre", "full": true}, {"id": "zip", "label": "ZIP Code", "placeholder": "00901", "half": true}, {"id": "ciudad", "label": "Ciudad", "placeholder": "San Juan", "half": true}, {"id": "urb", "label": "Urbanización", "placeholder": "Condado", "full": true}, {"id": "calle", "label": "Dirección", "placeholder": "Calle Loíza 123", "full": true}]}, {"code": "SV", "flag": "🇸🇻", "name": "El Salvador", "fields": [{"id": "nombre", "label": "Nombre completo", "placeholder": "Tu nombre", "full": true}, {"id": "cp", "label": "Código Postal", "placeholder": "01101", "half": true}, {"id": "ciudad", "label": "Ciudad", "placeholder": "San Salvador", "half": true}, {"id": "dpto", "label": "Departamento", "placeholder": "San Salvador", "half": true}, {"id": "colonia", "label": "Colonia", "placeholder": "Escalón", "half": true}, {"id": "calle", "label": "Dirección", "placeholder": "Calle La Mascota #123", "full": true}]}, {"code": "NI", "flag": "🇳🇮", "name": "Nicaragua", "fields": [{"id": "nombre", "label": "Nombre completo", "placeholder": "Tu nombre", "full": true}, {"id": "ciudad", "label": "Ciudad", "placeholder": "Managua", "half": true}, {"id": "dpto", "label": "Departamento", "placeholder": "Managua", "half": true}, {"id": "barrio", "label": "Barrio", "placeholder": "Altamira", "full": true}, {"id": "calle", "label": "Referencia", "placeholder": "2 cuadras al norte del semáforo", "full": true}]}, {"code": "US", "flag": "🇺🇸", "name": "Estados Unidos", "fields": [{"id": "nombre", "label": "Nombre completo", "placeholder": "Tu nombre", "full": true}, {"id": "address", "label": "Dirección", "placeholder": "123 Main St, Apt 4B", "full": true}, {"id": "city", "label": "Ciudad", "placeholder": "New York", "half": true}, {"id": "state", "label": "Estado", "placeholder": "NY", "half": true}, {"id": "zip", "label": "ZIP Code", "placeholder": "10001", "half": true}]}, {"code": "GY", "flag": "🇬🇾", "name": "Guyana", "fields": [{"id": "nombre", "label": "Nombre completo", "placeholder": "Tu nombre", "full": true}, {"id": "ciudad", "label": "Ciudad", "placeholder": "Georgetown", "half": true}, {"id": "region", "label": "Región", "placeholder": "Demerara-Mahaica", "half": true}, {"id": "calle", "label": "Dirección", "placeholder": "Main St, 123", "full": true}]}, {"code": "SR", "flag": "🇸🇷", "name": "Surinam", "fields": [{"id": "nombre", "label": "Nombre completo", "placeholder": "Tu nombre", "full": true}, {"id": "ciudad", "label": "Ciudad", "placeholder": "Paramaribo", "half": true}, {"id": "distrito", "label": "Distrito", "placeholder": "Paramaribo", "half": true}, {"id": "calle", "label": "Dirección", "placeholder": "Henck Arronstraat 12", "full": true}]}];
+const productsData={"hombre": {"cats": [{"id": "ropa", "label": "Ropa", "icon": "👕", "hasSize": true, "sizeType": "ropa", "items": [{"name": "Camiseta", "icon": "👕"}, {"name": "Pantalón", "icon": "👖"}, {"name": "Sudadera", "icon": "🧥"}, {"name": "Short", "icon": "🩳"}, {"name": "Chaqueta", "icon": "🧥"}, {"name": "Polo", "icon": "👔"}]}, {"id": "calzado", "label": "Calzado", "icon": "👟", "hasSize": true, "sizeType": "calzado", "items": [{"name": "Zapatillas", "icon": "👟"}, {"name": "Sandalias", "icon": "🩴"}, {"name": "Botas", "icon": "🥾"}, {"name": "Zapatos", "icon": "👞"}, {"name": "Chanclas", "icon": "🩴"}]}, {"id": "accesorios", "label": "Accesorios", "icon": "⌚", "hasSize": false, "items": [{"name": "Reloj", "icon": "⌚"}, {"name": "Billetera", "icon": "👛"}, {"name": "Cinturón", "icon": "🧣"}, {"name": "Gafas", "icon": "🕶️"}, {"name": "Gorra", "icon": "🧢"}]}, {"id": "personales", "label": "Personales", "icon": "🎒", "hasSize": false, "items": [{"name": "Mochila", "icon": "🎒"}, {"name": "Perfume", "icon": "🧴"}, {"name": "Neceser", "icon": "💼"}, {"name": "Paraguas", "icon": "☂️"}]}, {"id": "intimos", "label": "Íntimos", "icon": "🩲", "hasSize": true, "sizeType": "ropa", "items": [{"name": "Calzoncillo", "icon": "🩲"}, {"name": "Calcetines", "icon": "🧦"}, {"name": "Pijama", "icon": "🛌"}]}]}, "mujer": {"cats": [{"id": "ropa", "label": "Ropa", "icon": "👗", "hasSize": true, "sizeType": "ropa", "items": [{"name": "Blusa", "icon": "👚"}, {"name": "Vestido", "icon": "👗"}, {"name": "Pantalón", "icon": "👖"}, {"name": "Falda", "icon": "🩱"}, {"name": "Abrigo", "icon": "🧥"}, {"name": "Conjunto", "icon": "👘"}]}, {"id": "calzado", "label": "Calzado", "icon": "👠", "hasSize": true, "sizeType": "calzado", "items": [{"name": "Tacones", "icon": "👠"}, {"name": "Zapatillas", "icon": "👟"}, {"name": "Sandalias", "icon": "👡"}, {"name": "Botas", "icon": "🥾"}, {"name": "Chanclas", "icon": "🩴"}]}, {"id": "accesorios", "label": "Accesorios", "icon": "💍", "hasSize": false, "items": [{"name": "Bolso", "icon": "👜"}, {"name": "Aretes", "icon": "💎"}, {"name": "Collar", "icon": "📿"}, {"name": "Gafas", "icon": "🕶️"}, {"name": "Reloj", "icon": "⌚"}]}, {"id": "personales", "label": "Personales", "icon": "💄", "hasSize": false, "items": [{"name": "Perfume", "icon": "🧴"}, {"name": "Neceser", "icon": "💼"}, {"name": "Espejo", "icon": "🪞"}, {"name": "Billetera", "icon": "👛"}]}, {"id": "intimos", "label": "Íntimos", "icon": "🩱", "hasSize": true, "sizeType": "ropa", "items": [{"name": "Sujetador", "icon": "🩱"}, {"name": "Braguitas", "icon": "🩲"}, {"name": "Pijama", "icon": "🛌"}, {"name": "Calcetines", "icon": "🧦"}]}, {"id": "hogar", "label": "Hogar", "icon": "🏠", "hasSize": false, "items": [{"name": "Ropa de cama", "icon": "🛏️"}, {"name": "Toalla", "icon": "🧺"}, {"name": "Vela", "icon": "🕯️"}, {"name": "Organizador", "icon": "📦"}]}]}};
+const roupaSizes=["XS", "S", "M", "L", "XL", "XXL"];
+const calcadoSizes=["35", "36", "37", "38", "39", "40", "41", "42", "43", "44", "45"];
+const T={
+  noItems:"Ningún artículo agregado aún",
+  addCart:"+ Agregar al carrito",
+  added:"✓ ¡Agregado!",
+  sizeLabel:"Talla:",
+  numberLabel:"Número:",
+  sizeBadge:"+ talla",
+  productsLabel:"Productos —",
+  rescueCode:"Código de canje: ",
+  countryNotFound:"Ningún país encontrado",
+  selectPlaceholder:"Selecciona el país...",
+  trackingCodeLabel:"Tu código de rastreo:",
+  copyBtn:"Copiar",
+  copied:"¡Copiado!",
+  trackingNotFound:"Código no encontrado. Verifica e intenta de nuevo.",
+  trackingOrder:"Pedido",
+  trackingItems:"Artículos",
+  trackingCountry:"Destino",
+  statuses:[
+    {label:"Pedido Confirmado",desc:"Tu pedido fue confirmado y está siendo preparado.",icon:'✅'},
+    {label:"Enviado",desc:"Tu pedido fue despachado y está en camino.",icon:'📤'},
+    {label:"En Tránsito",desc:"Tu pedido está en tránsito en el país de destino.",icon:'🚚'},
+    {label:"Entregado",desc:"¡Tu pedido fue entregado con éxito!",icon:'🏠'},
+  ],
+};
+
+// ── STORAGE (pedidos salvos em memória da sessão) ────────────
+const STORAGE_KEY='premiacion_orders';
+let ordersDB={};
+try{const saved=sessionStorage.getItem(STORAGE_KEY);if(saved)ordersDB=JSON.parse(saved);}catch{}
+function saveOrder(code,data){
+  ordersDB[code]=data;
+  try{sessionStorage.setItem(STORAGE_KEY,JSON.stringify(ordersDB));}catch{}
+}
+function getOrder(code){return ordersDB[code]||null;}
+
+// ── SIDEBAR ───────────────────────────────────────────────────
+function openSidebar(){document.getElementById('sidebar').classList.add('open');document.getElementById('sidebarOverlay').classList.add('open');}
+function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('sidebarOverlay').classList.remove('open');}
+
+// ── MODALS ────────────────────────────────────────────────────
+function openModal(id){
+  document.getElementById(id).classList.add('open');
+  if(id==='modalTracking'){document.getElementById('trackInput').value='';document.getElementById('trackResult').innerHTML='';}
+  if(id==='modalOrders'){buildOrderCard(getSavedOrder(),'ordersContent','ordersCopyBtn');}
+}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+function closeModalOutside(e,id){if(e.target===document.getElementById(id))closeModal(id);}
+
+// ── TRACKING ─────────────────────────────────────────────────
+function doTrack(){
+  const code=document.getElementById('trackInput').value.trim().toUpperCase();
+  const div=document.getElementById('trackResult');
+  if(!code){div.innerHTML='';return;}
+  const order=getOrder(code);
+  if(!order){div.innerHTML=`<div class="track-not-found">${T.trackingNotFound}</div>`;return;}
+  // Simula progressão: 1 step por dia desde criação (máx 4)
+  const daysElapsed=Math.floor((Date.now()-order.createdAt)/(1000*60*60*24));
+  const currentStep=Math.min(daysElapsed,3); // 0=confirmado,1=enviado,2=trânsito,3=entregue
+  let itemsHtml=order.items.map(i=>`<div class="track-item-row"><span>${i.icon}</span><span>${i.name}${i.size?' — '+i.size:''}</span></div>`).join('');
+  let timelineHtml=T.statuses.map((s,idx)=>{
+    let cls=idx<currentStep?'done':idx===currentStep?'active':'';
+    return `<div class="tl-step ${cls}"><div class="tl-line"></div><div class="tl-dot">${idx<=currentStep?s.icon:'○'}</div><div class="tl-content"><div class="tl-title">${s.label}</div><div class="tl-desc">${s.desc}</div></div></div>`;
+  }).join('');
+  div.innerHTML=`
+    <div class="track-result">
+      <div class="track-result-header">
+        <span class="track-result-code">${code}</span>
+        <span class="track-result-country">${order.flag} ${order.country}</span>
+      </div>
+      <div style="font-size:12px;color:#888;font-weight:700;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">${T.trackingItems}</div>
+      <div class="track-items-list">${itemsHtml}</div>
+      <div class="timeline">${timelineHtml}</div>
+    </div>`;
+}
+
+// ── DROPDOWN ─────────────────────────────────────────────────
+let genero=null,selectedCountry=null,cart=[],curCat=null,curItem=null,curSize=null,dropOpen=false;
+function renderDropList(list){const div=document.getElementById('dropdownList');div.innerHTML='';if(!list.length){div.innerHTML=`<div class="dropdown-empty">${T.countryNotFound}</div>`;return;}list.forEach(c=>{const d=document.createElement('div');d.className='dropdown-item'+(selectedCountry&&selectedCountry.code===c.code?' selected':'');d.innerHTML=`<span class="dropdown-item-flag">${c.flag}</span><span>${c.name}</span>`;d.onclick=()=>{selectedCountry=c;document.getElementById('triggerFlag').textContent=c.flag;const lbl=document.getElementById('triggerLabel');lbl.textContent=c.name;lbl.classList.remove('select-placeholder');closeDropdown();checkStep1();};div.appendChild(d);});}
+renderDropList(countries);
+function toggleDropdown(){dropOpen=!dropOpen;document.getElementById('dropdownMenu').classList.toggle('open',dropOpen);document.getElementById('selectTrigger').classList.toggle('open',dropOpen);if(dropOpen){document.getElementById('dropSearch').value='';renderDropList(countries);setTimeout(()=>document.getElementById('dropSearch').focus(),50);}}
+function closeDropdown(){dropOpen=false;document.getElementById('dropdownMenu').classList.remove('open');document.getElementById('selectTrigger').classList.remove('open');}
+function filterDropdown(q){renderDropList(countries.filter(c=>c.name.toLowerCase().includes(q.toLowerCase())));}
+document.addEventListener('click',e=>{if(dropOpen&&!document.getElementById('selectWrapper').contains(e.target))closeDropdown();});
+
+function selectGender(g,el){genero=g;document.querySelectorAll('.gender-card').forEach(c=>c.classList.remove('selected'));el.classList.add('selected');checkStep1();}
+function checkStep1(){const ok=!!(genero&&selectedCountry);document.getElementById('btn1').disabled=!ok;document.getElementById('hintText').style.display=ok?'none':'block';}
+
+// ── NAVEGAÇÃO ─────────────────────────────────────────────────
+function goStep(n){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById('screen'+n).classList.add('active');updateProgress(n);if(n===2)buildCats();if(n===3)buildCartFull();if(n===4)buildAddressForm();document.getElementById('cartBtn').style.display=cart.length>0&&n<5?'flex':'none';document.getElementById('progressBar').style.display=n===5?'none':'flex';window.scrollTo(0,0);}
+function updateProgress(n){[1,2,3,4].forEach(i=>{const el=document.getElementById('s'+i);el.classList.remove('active','done');if(i<n){el.classList.add('done');el.querySelector('.step-num').innerHTML='✓';}else if(i===n)el.classList.add('active');else el.querySelector('.step-num').textContent=i;});[1,2,3].forEach(i=>document.getElementById('sep'+i).classList.toggle('done',i<n));}
+
+// ── PRODUTOS ──────────────────────────────────────────────────
+function buildCats(){const cats=productsData[genero].cats;const grid=document.getElementById('catGrid');grid.innerHTML='';curCat=null;curItem=null;curSize=null;document.getElementById('itemArea').style.display='none';document.getElementById('addBtn').disabled=true;renderCartPreview();cats.forEach(cat=>{const d=document.createElement('div');d.className='cat-card';d.innerHTML=`<div class="cat-icon">${cat.icon}</div><div class="cat-label">${cat.label}</div>`;d.onclick=()=>{document.querySelectorAll('.cat-card').forEach(c=>c.classList.remove('selected'));d.classList.add('selected');curCat=cat;curItem=null;curSize=null;document.getElementById('addBtn').disabled=true;buildItemsArea(cat);};grid.appendChild(d);});}
+function buildItemsArea(cat){document.getElementById('itemArea').style.display='block';document.getElementById('itemTitle').textContent=T.productsLabel+' '+cat.label;const grid=document.getElementById('itemsGrid');grid.innerHTML='';document.getElementById('sizeSection').style.display='none';cat.items.forEach(item=>{const d=document.createElement('div');d.className='item-card';d.innerHTML=`<div class="item-icon">${item.icon}</div><div class="item-name">${item.name}</div>${cat.hasSize?`<div class="item-badge">${T.sizeBadge}</div>`:''}`; d.onclick=()=>{document.querySelectorAll('.item-card').forEach(c=>c.classList.remove('selected'));d.classList.add('selected');curItem=item;curSize=null;document.getElementById('addBtn').disabled=cat.hasSize;if(cat.hasSize){buildSizes(cat.sizeType);document.getElementById('sizeSection').style.display='block';}else document.getElementById('sizeSection').style.display='none';};grid.appendChild(d);});}
+function buildSizes(type){const sizes=type==='calcado'?calcadoSizes:roupaSizes;const grid=document.getElementById('sizeGrid');grid.innerHTML='';document.getElementById('sizeLabelText').textContent=type==='calcado'?T.numberLabel:T.sizeLabel;sizes.forEach(s=>{const btn=document.createElement('button');btn.className='size-btn';btn.textContent=s;btn.onclick=()=>{document.querySelectorAll('.size-btn').forEach(b=>b.classList.remove('selected'));btn.classList.add('selected');curSize=s;document.getElementById('addBtn').disabled=false;};grid.appendChild(btn);});}
+function addToCart(){if(!curItem)return;cart.push({icon:curItem.icon,name:curItem.name,cat:curCat.label,size:curSize});curItem=null;curSize=null;document.querySelectorAll('.item-card,.size-btn').forEach(c=>c.classList.remove('selected'));document.getElementById('sizeSection').style.display='none';document.getElementById('addBtn').disabled=true;renderCartPreview();document.getElementById('btn2').disabled=false;document.getElementById('cartBtn').style.display='flex';document.getElementById('cartCount').textContent=cart.length;const btn=document.getElementById('addBtn');btn.textContent=T.added;setTimeout(()=>btn.textContent=T.addCart,1400);}
+function renderCartPreview(){const list=document.getElementById('cartList');const label=document.getElementById('cartCountLabel');document.getElementById('cartCount').textContent=cart.length;label.textContent=cart.length>0?`(${cart.length})`:'';if(!cart.length){list.innerHTML=`<div class="cart-empty">${T.noItems}</div>`;document.getElementById('btn2').disabled=true;return;}list.innerHTML='';cart.forEach((item,i)=>{const row=document.createElement('div');row.className='cart-item';row.innerHTML=`<div class="cart-item-info"><div class="cart-item-icon">${item.icon}</div><div><div class="cart-item-name">${item.name}${item.size?' — '+item.size:''}</div><div class="cart-item-size">${item.cat}</div></div></div><button class="cart-remove" onclick="removeItem(${i})">✕</button>`;list.appendChild(row);});}
+function buildCartFull(){const div=document.getElementById('cartFull');div.innerHTML='';cart.forEach((item,i)=>{const row=document.createElement('div');row.className='cart-item';row.innerHTML=`<div class="cart-item-info"><div class="cart-item-icon">${item.icon}</div><div><div class="cart-item-name">${item.name}${item.size?' — '+item.size:''}</div><div class="cart-item-size">${item.cat}</div></div></div><button class="cart-remove" onclick="removeItem(${i});buildCartFull();">✕</button>`;div.appendChild(row);});}
+function removeItem(i){cart.splice(i,1);renderCartPreview();document.getElementById('cartCount').textContent=cart.length;if(!cart.length)document.getElementById('cartBtn').style.display='none';}
+
+// ── ENDEREÇO ──────────────────────────────────────────────────
+function buildAddressForm(){const c=selectedCountry;document.getElementById('countryBadge').innerHTML=`${c.flag} <strong>${c.name}</strong>`;const sumDiv=document.getElementById('sumItems');sumDiv.innerHTML='';cart.forEach(item=>{const row=document.createElement('div');row.className='sum-item-row';row.innerHTML=`<span style="font-size:20px">${item.icon}</span><span class="sum-item-text">${item.name}</span>${item.size?`<span class="sum-item-tag">${item.size}</span>`:''}`; sumDiv.appendChild(row);});const form=document.getElementById('addressForm');form.innerHTML='';let i=0;while(i<c.fields.length){const f=c.fields[i];if(f.full){const row=document.createElement('div');row.className='form-row';row.innerHTML=`<label class="form-label">${f.label}</label><input class="form-input" id="addr_${f.id}" type="text" placeholder="${f.placeholder}" oninput="checkAddrForm()">`;form.appendChild(row);i++;}else{const next=c.fields[i+1];if(next&&!next.full){const row=document.createElement('div');row.className='form-row-2';row.innerHTML=`<div><label class="form-label">${f.label}</label><input class="form-input" id="addr_${f.id}" type="text" placeholder="${f.placeholder}" oninput="checkAddrForm()"></div><div><label class="form-label">${next.label}</label><input class="form-input" id="addr_${next.id}" type="text" placeholder="${next.placeholder}" oninput="checkAddrForm()"></div>`;form.appendChild(row);i+=2;}else{const row=document.createElement('div');row.className='form-row';row.innerHTML=`<label class="form-label">${f.label}</label><input class="form-input" id="addr_${f.id}" type="text" placeholder="${f.placeholder}" oninput="checkAddrForm()">`;form.appendChild(row);i++;}}}document.getElementById('btn4').disabled=true;}
+function checkAddrForm(){const inputs=document.querySelectorAll('#addressForm .form-input');document.getElementById('btn4').disabled=!Array.from(inputs).every(inp=>inp.value.trim().length>0);}
+
+// ── BLOQUEIO POR DISPOSITIVO ──────────────────────────────────
+function checkDeviceBlocked(){
+  return localStorage.getItem('premiacion_canjeado')==='1';
+}
+function markDeviceBlocked(trackCode, orderData){
+  localStorage.setItem('premiacion_canjeado','1');
+  localStorage.setItem('premiacion_pedido', JSON.stringify({
+    trackCode,
+    name: orderData.name,
+    country: orderData.country,
+    flag: orderData.flag,
+    items: orderData.items,
+    createdAt: orderData.createdAt
+  }));
+}
+function getSavedOrder(){
+  try{ return JSON.parse(localStorage.getItem('premiacion_pedido')); }catch(e){ return null; }
+}
+
+// ── PRAZO POR PAÍS ────────────────────────────────────────────
+const deliveryDaysByCountry={
+  BR:[20,35],AR:[25,40],MX:[25,40],CO:[28,42],CL:[25,40],
+  PE:[28,42],US:[30,45],VE:[30,48],EC:[28,42],BO:[30,45],
+  PY:[28,42],UY:[28,42],GT:[30,45],CR:[30,45],PA:[30,45],
+  HN:[30,45],DO:[30,45],CU:[35,50],PR:[25,38],SV:[30,45],
+  NI:[30,45],GY:[35,50],SR:[35,50]
+};
+function getDeliveryDays(countryCode){
+  return deliveryDaysByCountry[countryCode]||[25,40];
+}
+
+// ── TICKER PROVA SOCIAL ───────────────────────────────────────
+const tickerData=[
+  {name:'María S.',country:'🇦🇷 Argentina',item:'👗 Vestido'},
+  {name:'Carlos M.',country:'🇲🇽 México',item:'👟 Zapatillas'},
+  {name:'Ana P.',country:'🇨🇴 Colombia',item:'👜 Bolso'},
+  {name:'Juan R.',country:'🇨🇱 Chile',item:'⌚ Reloj'},
+  {name:'Luisa G.',country:'🇵🇪 Perú',item:'💍 Collar'},
+  {name:'Pedro T.',country:'🇻🇪 Venezuela',item:'🎒 Mochila'},
+  {name:'Sofía N.',country:'🇲🇽 México',item:'👠 Tacones'},
+  {name:'Miguel F.',country:'🇦🇷 Argentina',item:'🧥 Chaqueta'},
+  {name:'Camila B.',country:'🇨🇴 Colombia',item:'🕶️ Gafas'},
+  {name:'Andrés V.',country:'🇨🇱 Chile',item:'👕 Camiseta'},
+];
+function buildTicker(){
+  const track=document.getElementById('tickerTrack');
+  if(!track) return;
+  const doubled=[...tickerData,...tickerData];
+  track.innerHTML=doubled.map(d=>`<div class="ticker-item"><div class="ticker-dot"></div>${d.name} de ${d.country} canjeó ${d.item}</div>`).join('');
+}
+
+// ── CONTADOR REGRESSIVO ───────────────────────────────────────
+let countdownInterval=null;
+function startCountdown(deadlineMs){
+  if(countdownInterval) clearInterval(countdownInterval);
+  function update(){
+    const diff=deadlineMs-Date.now();
+    if(diff<=0){ clearInterval(countdownInterval); return; }
+    const d=Math.floor(diff/86400000);
+    const h=Math.floor((diff%86400000)/3600000);
+    const m=Math.floor((diff%3600000)/60000);
+    const s=Math.floor((diff%60000)/1000);
+    const pad=n=>String(n).padStart(2,'0');
+    document.getElementById('cdDays').textContent=pad(d);
+    document.getElementById('cdHours').textContent=pad(h);
+    document.getElementById('cdMins').textContent=pad(m);
+    document.getElementById('cdSecs').textContent=pad(s);
+  }
+  update();
+  countdownInterval=setInterval(update,1000);
+}
+
+// ── NÚMERO DE PEDIDO PROFISSIONAL ─────────────────────────────
+function generateOrderNumber(countryCode){
+  const seq=String(Math.floor(Math.random()*90000)+10000);
+  const year=new Date().getFullYear();
+  return `#${countryCode}-${year}-${seq}`;
+}
+
+function buildOrderCard(order, containerId, copyBtnId){
+  if(!order){ document.getElementById(containerId).innerHTML=`<div class="orders-empty">📭 Ningún pedido encontrado.</div>`; return; }
+  const date = new Date(order.createdAt).toLocaleDateString('es-ES',{day:'2-digit',month:'2-digit',year:'numeric'});
+  const itemsHtml = order.items.map(i=>`<div class="order-card-item"><span style="font-size:18px">${i.icon}</span><span><strong>${i.name}</strong>${i.size?' — '+i.size:''}</span></div>`).join('');
+  // Timeline: sempre mostra "Confirmado" e "Em separação" como done, "Enviado" como active
+  const tlSteps=[
+    {label:'Confirmado',icon:'✓',state:'done'},
+    {label:'En preparación',icon:'✓',state:'done'},
+    {label:'Enviado',icon:'●',state:'active'},
+    {label:'En camino',icon:'',state:''},
+    {label:'Entregado',icon:'',state:''},
+  ];
+  const tlHtml=tlSteps.map(s=>`<div class="order-tl-step ${s.state}"><div class="order-tl-dot">${s.icon}</div><div class="order-tl-label">${s.label}</div></div>`).join('');
+  document.getElementById(containerId).innerHTML=`
+    <div class="order-card">
+      <div class="order-card-header">
+        <div class="order-card-country">${order.flag} ${order.country}</div>
+        <div class="order-card-date">📅 ${date}</div>
+      </div>
+      <div class="order-card-items">${itemsHtml}</div>
+      <div class="order-card-tracking">
+        <div>
+          <div class="order-card-tracking-label">Código de Rastreo</div>
+          <div class="order-card-tracking-code">${order.trackCode}</div>
+        </div>
+        <button class="order-card-copy" id="${copyBtnId}" onclick="copyOrderCode('${order.trackCode}','${copyBtnId}')">Copiar</button>
+      </div>
+      <div class="order-timeline">
+        <div class="order-tl-title">Estado del pedido</div>
+        <div class="order-tl-steps">${tlHtml}</div>
+      </div>
+    </div>`;
+}
+
+function copyOrderCode(code, btnId){
+  navigator.clipboard.writeText(code).catch(()=>{});
+  const btn=document.getElementById(btnId);
+  if(!btn) return;
+  btn.textContent='Copiado!'; btn.classList.add('copied');
+  setTimeout(()=>{ btn.textContent='Copiar'; btn.classList.remove('copied'); }, 2000);
+}
+
+// ── FINALIZAR ─────────────────────────────────────────────────
+let currentTrackingCode='';
+function finalizar(){
+  // Verificar se já canjeó neste dispositivo
+  if(checkDeviceBlocked()){
+    document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+    document.getElementById('screenBlocked').classList.add('active');
+    document.getElementById('progressBar').style.display='none';
+    document.getElementById('cartBtn').style.display='none';
+    buildOrderCard(getSavedOrder(),'blockedOrderInfo','blockedCopyBtn');
+    window.scrollTo(0,0);
+    return;
+  }
+
+  // Mostrar tela de carregamento
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screenLoading').classList.add('active');
+  document.getElementById('progressBar').style.display='none';
+  document.getElementById('cartBtn').style.display='none';
+  window.scrollTo(0,0);
+
+  // Aguardar 2.5 segundos e então mostrar sucesso
+  setTimeout(()=>{
+    _finalizarComSucesso();
+  }, 2500);
+}
+
+function _finalizarComSucesso(){
+  const nome=document.querySelector('#addressForm .form-input')?.value.trim()||'';
+  const trackCode='PREM-'+Date.now().toString(36).toUpperCase().slice(-4)+Math.random().toString(36).substring(2,6).toUpperCase();
+  currentTrackingCode=trackCode;
+  const orderNum=generateOrderNumber(selectedCountry.code);
+  const [dMin,dMax]=getDeliveryDays(selectedCountry.code);
+  const deadlineMs=Date.now()+(dMax*24*60*60*1000);
+  saveOrder(trackCode,{
+    name:nome,
+    items:cart.map(i=>({icon:i.icon,name:i.name,size:i.size})),
+    country:selectedCountry.name,
+    flag:selectedCountry.flag,
+    createdAt:Date.now(),
+  });
+  document.getElementById('successMsg').innerHTML=`<strong>${nome}</strong> 🏆 — ${selectedCountry.flag} <strong>${selectedCountry.name}</strong>`;
+  const itemsDiv=document.getElementById('successItems');itemsDiv.innerHTML='';
+  cart.forEach(item=>{const row=document.createElement('div');row.className='success-item';row.innerHTML=`<span style="font-size:22px">${item.icon}</span><span><strong>${item.name}</strong>${item.size?' — '+item.size:''}</span>`;itemsDiv.appendChild(row);});
+  document.getElementById('deliveryDays').textContent=`${dMin} a ${dMax}`;
+  document.getElementById('trackingCodeDisplay').textContent=trackCode;
+  document.getElementById('copyBtn').textContent=T.copyBtn;
+  document.getElementById('copyBtn').classList.remove('copied');
+  document.getElementById('orderId').textContent=`Pedido ${orderNum}`;
+  startCountdown(deadlineMs);
+  markDeviceBlocked(trackCode, {
+    name: nome,
+    items: cart.map(i=>({icon:i.icon,name:i.name,size:i.size})),
+    country: selectedCountry.name,
+    flag: selectedCountry.flag,
+    createdAt: Date.now()
+  });
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen5').classList.add('active');
+  document.getElementById('progressBar').style.display='none';
+  document.getElementById('cartBtn').style.display='none';
+  window.scrollTo(0,0);
+}
+
+function copyCode(){
+  navigator.clipboard.writeText(currentTrackingCode).catch(()=>{});
+  const btn=document.getElementById('copyBtn');
+  btn.textContent=T.copied;btn.classList.add('copied');
+  setTimeout(()=>{btn.textContent=T.copyBtn;btn.classList.remove('copied');},2000);
+}
+
+function resetar(){
+  genero=null;selectedCountry=null;cart=[];curCat=null;curItem=null;curSize=null;currentTrackingCode='';
+  document.getElementById('triggerFlag').textContent='🌎';
+  const lbl=document.getElementById('triggerLabel');lbl.textContent=T.selectPlaceholder;lbl.classList.add('select-placeholder');
+  document.getElementById('progressBar').style.display='flex';
+  document.getElementById('cartBtn').style.display='none';
+  goStep(1);
+  document.querySelectorAll('.gender-card').forEach(c=>c.classList.remove('selected'));
+  document.getElementById('btn1').disabled=true;
+  document.getElementById('hintText').style.display='block';
+}
+
+// Verificar bloqueio ao carregar a página
+window.addEventListener('DOMContentLoaded',()=>{
+  buildTicker();
+  if(checkDeviceBlocked()){
+    document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+    document.getElementById('screenBlocked').classList.add('active');
+    document.getElementById('progressBar').style.display='none';
+    document.getElementById('socialProof').style.display='none';
+    buildOrderCard(getSavedOrder(),'blockedOrderInfo','blockedCopyBtn');
+  }
+});
+</script>
+
+<script>
+// ══ LOGIN ═══════════════════════════════════════════════════════
+
+const SENHA_PADRAO = '123456';
+
+// ── Lista de e-mails autorizados ────────────────────────────────
+// SEU DEV: substitua este array pela chamada à API da Digistore24
+// Ex: const authorizedEmails = await fetch('/api/emails').then(r => r.json());
+const authorizedEmails = [
+  // 'cliente1@email.com',
+  // 'cliente2@email.com',
+  // adicione manualmente enquanto a API não está pronta
+];
+
+function normalizeEmail(e){ return e.trim().toLowerCase(); }
+
+async function checkEmailAuthorized(email){
+  // SEU DEV: aqui entra a chamada à API real
+  // Ex:
+  // const res = await fetch('/api/check-email', { method:'POST', body: JSON.stringify({email}), headers:{'Content-Type':'application/json'} });
+  // const data = await res.json();
+  // return data.authorized;
+
+  // Por enquanto: valida contra a lista local
+  return authorizedEmails.map(normalizeEmail).includes(normalizeEmail(email));
+}
+
+function showLoginError(msg){
+  const el = document.getElementById('loginError');
+  el.textContent = '⚠️ ' + msg;
+  el.classList.add('show');
+  document.getElementById('loginEmail').classList.add('error');
+  document.getElementById('loginPassword').classList.add('error');
+}
+
+function clearLoginError(){
+  document.getElementById('loginError').classList.remove('show');
+  document.getElementById('loginEmail').classList.remove('error');
+  document.getElementById('loginPassword').classList.remove('error');
+}
+
+function toggleLoginPassword(){
+  const input = document.getElementById('loginPassword');
+  const btn = document.getElementById('loginEyeBtn');
+  if(input.type === 'password'){ input.type = 'text'; btn.textContent = '🙈'; }
+  else { input.type = 'password'; btn.textContent = '👁️'; }
+}
+
+async function doLogin(){
+  const email = document.getElementById('loginEmail').value.trim();
+  const senha = document.getElementById('loginPassword').value;
+  const btn = document.getElementById('loginBtn');
+  const txtNormal = document.getElementById('loginBtnText');
+  const txtLoading = document.getElementById('loginBtnLoading');
+
+  clearLoginError();
+
+  if(!email){ showLoginError('Ingresa tu e-mail.'); return; }
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ showLoginError('E-mail inválido.'); return; }
+  if(!senha){ showLoginError('Ingresa tu contraseña.'); return; }
+  if(senha !== SENHA_PADRAO){ showLoginError('Contraseña incorrecta. Verifica e intenta de nuevo.'); return; }
+
+  // Loading state
+  btn.disabled = true;
+  txtNormal.style.display = 'none';
+  txtLoading.style.display = 'inline';
+
+  // Simula verificação (substitua pelo await checkEmailAuthorized quando a API estiver pronta)
+  await new Promise(r => setTimeout(r, 1200));
+  const autorizado = authorizedEmails.length === 0 ? true : await checkEmailAuthorized(email);
+  // NOTA PARA DEV: quando a API estiver pronta, remova a linha acima e deixe apenas:
+  // const autorizado = await checkEmailAuthorized(email);
+
+  btn.disabled = false;
+  txtNormal.style.display = 'inline';
+  txtLoading.style.display = 'none';
+
+  if(!autorizado){
+    showLoginError('E-mail no encontrado. Verifica si usaste el mismo e-mail de tu compra.');
+    return;
+  }
+
+  // Salvar sessão
+  sessionStorage.setItem('prem_logged_es', '1');
+  sessionStorage.setItem('prem_email_es', normalizeEmail(email));
+
+  // Esconder tela de login
+  document.getElementById('loginScreen').classList.add('hidden');
+}
+
+// Verificar se já está logado ao carregar
+window.addEventListener('DOMContentLoaded', () => {
+  if(sessionStorage.getItem('prem_logged_es') === '1'){
+    document.getElementById('loginScreen').classList.add('hidden');
+  }
+});
+</script>
+</body>
+</html>
